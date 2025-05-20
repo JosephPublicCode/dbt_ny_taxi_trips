@@ -22,6 +22,7 @@ renamed AS (
         ehail_fee,
         total_amount, 
         payment_type,
+        {{get_payment_type_description('payment_type')}} AS payment_description,
         trip_type, 
         improvement_surcharge, 
         pulocationid,
