@@ -1,9 +1,0 @@
-
-# default:
-#     target: dev
-#     outputs:
-#       dev:
-#         type: bigquery
-#         method: service-account
-#         project: kestra-sandbox-v2
-#         dataset: de_zoomcamp
