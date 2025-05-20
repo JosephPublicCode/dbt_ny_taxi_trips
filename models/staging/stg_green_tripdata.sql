@@ -19,17 +19,13 @@ renamed AS (
         mta_tax, 
         tip_amount, 
         tolls_amount, 
-        airport_fee,
+        ehail_fee,
         total_amount, 
-        payment_type, 
-        distance_between_service, 
-        time_between_service, 
+        payment_type,
         trip_type, 
         improvement_surcharge, 
         pulocationid,
-        dolocationid,
-        data_file_year,
-        data_file_month
+        dolocationid
 
     FROM source
 
