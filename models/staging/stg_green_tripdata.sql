@@ -7,6 +7,7 @@ source AS (
 
 renamed AS (
     SELECT 
+        {{ dbt.utils.generate_surrogate_key(['vendorid','lpep_pickup_datetime']) }} AS tripid,
         vendorid, 
         lpep_pickup_datetime, 
         lpep_dropoff_datetime, 
