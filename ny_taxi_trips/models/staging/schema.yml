@@ -1,0 +1,16 @@
+version: 2
+
+sources:
+  - name: staging
+    database: ny_taxi
+    schema: public
+   
+    tables:
+    - name: green_taxi_trips
+
+    - name: yellow_taxi_trips
+
+models:
+  - name: stg_green_tripdata
+  
+  - name: stg_yellow_tripdata
