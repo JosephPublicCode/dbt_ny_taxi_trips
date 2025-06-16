@@ -23547,3 +23547,127 @@ inner join dim_zones as dropoff_zone
 on trips_unioned.dropoff_locationid = dropoff_zone.locationid
   );
   
+[0m18:01:24.518251 [debug] [Thread-1 (]: SQL status: SELECT 11210818 in 144.127 seconds
+[0m18:01:24.528248 [debug] [Thread-1 (]: Using postgres connection "model.ny_taxi_trips.fact_trips"
+[0m18:01:24.528610 [debug] [Thread-1 (]: On model.ny_taxi_trips.fact_trips: /* {"app": "dbt", "dbt_version": "1.9.2", "profile_name": "ny_taxi_trips", "target_name": "dev", "node_id": "model.ny_taxi_trips.fact_trips"} */
+alter table "ny_taxi"."public"."fact_trips" rename to "fact_trips__dbt_backup"
+[0m18:01:24.532042 [debug] [Thread-1 (]: SQL status: ALTER TABLE in 0.003 seconds
+[0m18:01:24.533842 [debug] [Thread-1 (]: Using postgres connection "model.ny_taxi_trips.fact_trips"
+[0m18:01:24.534049 [debug] [Thread-1 (]: On model.ny_taxi_trips.fact_trips: /* {"app": "dbt", "dbt_version": "1.9.2", "profile_name": "ny_taxi_trips", "target_name": "dev", "node_id": "model.ny_taxi_trips.fact_trips"} */
+alter table "ny_taxi"."public"."fact_trips__dbt_tmp" rename to "fact_trips"
+[0m18:01:24.596074 [debug] [Thread-1 (]: SQL status: ALTER TABLE in 0.061 seconds
+[0m18:01:24.600467 [debug] [Thread-1 (]: On model.ny_taxi_trips.fact_trips: COMMIT
+[0m18:01:24.601771 [debug] [Thread-1 (]: Using postgres connection "model.ny_taxi_trips.fact_trips"
+[0m18:01:24.602810 [debug] [Thread-1 (]: On model.ny_taxi_trips.fact_trips: COMMIT
+[0m18:01:24.608144 [debug] [Thread-1 (]: SQL status: COMMIT in 0.005 seconds
+[0m18:01:24.617416 [debug] [Thread-1 (]: Applying DROP to: "ny_taxi"."public"."fact_trips__dbt_backup"
+[0m18:01:24.618768 [debug] [Thread-1 (]: Using postgres connection "model.ny_taxi_trips.fact_trips"
+[0m18:01:24.619297 [debug] [Thread-1 (]: On model.ny_taxi_trips.fact_trips: /* {"app": "dbt", "dbt_version": "1.9.2", "profile_name": "ny_taxi_trips", "target_name": "dev", "node_id": "model.ny_taxi_trips.fact_trips"} */
+drop table if exists "ny_taxi"."public"."fact_trips__dbt_backup" cascade
+[0m18:01:24.664505 [debug] [Thread-1 (]: SQL status: DROP TABLE in 0.044 seconds
+[0m18:01:24.670631 [debug] [Thread-1 (]: On model.ny_taxi_trips.fact_trips: Close
+[0m18:01:24.679780 [debug] [Thread-1 (]: Sending event: {'category': 'dbt', 'action': 'run_model', 'label': 'f4cdfb2d-97a7-4718-92dd-d055bf24d188', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x10633fb00>]}
+[0m18:01:24.682026 [info ] [Thread-1 (]: 4 of 5 OK created sql table model public.fact_trips ............................ [[32mSELECT 11210818[0m in 144.30s]
+[0m18:01:24.683051 [debug] [Thread-1 (]: Finished running node model.ny_taxi_trips.fact_trips
+[0m18:01:24.686917 [debug] [Thread-1 (]: Began running node model.ny_taxi_trips.dim_monthly_zone_revenue
+[0m18:01:24.688382 [info ] [Thread-1 (]: 5 of 5 START sql table model public.dim_monthly_zone_revenue ................... [RUN]
+[0m18:01:24.689178 [debug] [Thread-1 (]: Re-using an available connection from the pool (formerly model.ny_taxi_trips.fact_trips, now model.ny_taxi_trips.dim_monthly_zone_revenue)
+[0m18:01:24.690210 [debug] [Thread-1 (]: Began compiling node model.ny_taxi_trips.dim_monthly_zone_revenue
+[0m18:01:24.699842 [debug] [Thread-1 (]: Writing injected SQL for node "model.ny_taxi_trips.dim_monthly_zone_revenue"
+[0m18:01:24.701094 [debug] [Thread-1 (]: Began executing node model.ny_taxi_trips.dim_monthly_zone_revenue
+[0m18:01:24.703000 [debug] [Thread-1 (]: Writing runtime sql for node "model.ny_taxi_trips.dim_monthly_zone_revenue"
+[0m18:01:24.703560 [debug] [Thread-1 (]: Using postgres connection "model.ny_taxi_trips.dim_monthly_zone_revenue"
+[0m18:01:24.703744 [debug] [Thread-1 (]: On model.ny_taxi_trips.dim_monthly_zone_revenue: BEGIN
+[0m18:01:24.703917 [debug] [Thread-1 (]: Opening a new connection, currently in state closed
+[0m18:01:24.718782 [debug] [Thread-1 (]: SQL status: BEGIN in 0.015 seconds
+[0m18:01:24.719115 [debug] [Thread-1 (]: Using postgres connection "model.ny_taxi_trips.dim_monthly_zone_revenue"
+[0m18:01:24.719471 [debug] [Thread-1 (]: On model.ny_taxi_trips.dim_monthly_zone_revenue: /* {"app": "dbt", "dbt_version": "1.9.2", "profile_name": "ny_taxi_trips", "target_name": "dev", "node_id": "model.ny_taxi_trips.dim_monthly_zone_revenue"} */
+
+  
+    
+
+  create  table "ny_taxi"."public"."dim_monthly_zone_revenue__dbt_tmp"
+  
+  
+    as
+  
+  (
+    
+
+with trips_data as (
+    select * from "ny_taxi"."public"."fact_trips"
+)
+    select 
+    -- Revenue grouping 
+    pickup_zone as revenue_zone,
+    date_trunc('month', pickup_datetime) as revenue_month, 
+
+    service_type, 
+
+    -- Revenue calculation 
+    sum(fare_amount) as revenue_monthly_fare,
+    sum(extra) as revenue_monthly_extra,
+    sum(mta_tax) as revenue_monthly_mta_tax,
+    sum(tip_amount) as revenue_monthly_tip_amount,
+    sum(tolls_amount) as revenue_monthly_tolls_amount,
+    sum(ehail_fee) as revenue_monthly_ehail_fee,
+    sum(improvement_surcharge) as revenue_monthly_improvement_surcharge,
+    sum(total_amount) as revenue_monthly_total_amount,
+
+    -- Additional calculations
+    count(tripid) as total_monthly_trips,
+    avg(passenger_count) as avg_monthly_passenger_count,
+    avg(trip_distance) as avg_monthly_trip_distance
+
+    from trips_data
+    group by 1,2,3
+  );
+  
+[0m18:02:26.935547 [debug] [Thread-1 (]: SQL status: SELECT 7849 in 62.216 seconds
+[0m18:02:26.943802 [debug] [Thread-1 (]: Using postgres connection "model.ny_taxi_trips.dim_monthly_zone_revenue"
+[0m18:02:26.944183 [debug] [Thread-1 (]: On model.ny_taxi_trips.dim_monthly_zone_revenue: /* {"app": "dbt", "dbt_version": "1.9.2", "profile_name": "ny_taxi_trips", "target_name": "dev", "node_id": "model.ny_taxi_trips.dim_monthly_zone_revenue"} */
+alter table "ny_taxi"."public"."dim_monthly_zone_revenue" rename to "dim_monthly_zone_revenue__dbt_backup"
+[0m18:02:26.946537 [debug] [Thread-1 (]: SQL status: ALTER TABLE in 0.002 seconds
+[0m18:02:26.948442 [debug] [Thread-1 (]: Using postgres connection "model.ny_taxi_trips.dim_monthly_zone_revenue"
+[0m18:02:26.948667 [debug] [Thread-1 (]: On model.ny_taxi_trips.dim_monthly_zone_revenue: /* {"app": "dbt", "dbt_version": "1.9.2", "profile_name": "ny_taxi_trips", "target_name": "dev", "node_id": "model.ny_taxi_trips.dim_monthly_zone_revenue"} */
+alter table "ny_taxi"."public"."dim_monthly_zone_revenue__dbt_tmp" rename to "dim_monthly_zone_revenue"
+[0m18:02:26.950000 [debug] [Thread-1 (]: SQL status: ALTER TABLE in 0.001 seconds
+[0m18:02:26.951053 [debug] [Thread-1 (]: On model.ny_taxi_trips.dim_monthly_zone_revenue: COMMIT
+[0m18:02:26.951254 [debug] [Thread-1 (]: Using postgres connection "model.ny_taxi_trips.dim_monthly_zone_revenue"
+[0m18:02:26.951412 [debug] [Thread-1 (]: On model.ny_taxi_trips.dim_monthly_zone_revenue: COMMIT
+[0m18:02:26.953015 [debug] [Thread-1 (]: SQL status: COMMIT in 0.001 seconds
+[0m18:02:26.954808 [debug] [Thread-1 (]: Applying DROP to: "ny_taxi"."public"."dim_monthly_zone_revenue__dbt_backup"
+[0m18:02:26.955142 [debug] [Thread-1 (]: Using postgres connection "model.ny_taxi_trips.dim_monthly_zone_revenue"
+[0m18:02:26.955319 [debug] [Thread-1 (]: On model.ny_taxi_trips.dim_monthly_zone_revenue: /* {"app": "dbt", "dbt_version": "1.9.2", "profile_name": "ny_taxi_trips", "target_name": "dev", "node_id": "model.ny_taxi_trips.dim_monthly_zone_revenue"} */
+drop table if exists "ny_taxi"."public"."dim_monthly_zone_revenue__dbt_backup" cascade
+[0m18:02:26.964235 [debug] [Thread-1 (]: SQL status: DROP TABLE in 0.009 seconds
+[0m18:02:26.965277 [debug] [Thread-1 (]: On model.ny_taxi_trips.dim_monthly_zone_revenue: Close
+[0m18:02:26.969385 [debug] [Thread-1 (]: Sending event: {'category': 'dbt', 'action': 'run_model', 'label': 'f4cdfb2d-97a7-4718-92dd-d055bf24d188', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x10619c560>]}
+[0m18:02:26.970460 [info ] [Thread-1 (]: 5 of 5 OK created sql table model public.dim_monthly_zone_revenue .............. [[32mSELECT 7849[0m in 62.28s]
+[0m18:02:26.970841 [debug] [Thread-1 (]: Finished running node model.ny_taxi_trips.dim_monthly_zone_revenue
+[0m18:02:26.973854 [debug] [MainThread]: Using postgres connection "master"
+[0m18:02:26.974067 [debug] [MainThread]: On master: BEGIN
+[0m18:02:26.974204 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m18:02:26.987715 [debug] [MainThread]: SQL status: BEGIN in 0.013 seconds
+[0m18:02:26.988012 [debug] [MainThread]: On master: COMMIT
+[0m18:02:26.988178 [debug] [MainThread]: Using postgres connection "master"
+[0m18:02:26.988312 [debug] [MainThread]: On master: COMMIT
+[0m18:02:26.988794 [debug] [MainThread]: SQL status: COMMIT in 0.000 seconds
+[0m18:02:26.989039 [debug] [MainThread]: On master: Close
+[0m18:02:26.989289 [debug] [MainThread]: Connection 'master' was properly closed.
+[0m18:02:26.989421 [debug] [MainThread]: Connection 'model.ny_taxi_trips.dim_monthly_zone_revenue' was properly closed.
+[0m18:02:26.989712 [info ] [MainThread]: 
+[0m18:02:26.989902 [info ] [MainThread]: Finished running 3 table models, 2 view models in 0 hours 3 minutes and 26.91 seconds (206.91s).
+[0m18:02:26.990485 [debug] [MainThread]: Command end result
+[0m18:02:27.057721 [debug] [MainThread]: Wrote artifact WritableManifest to /Users/josephdaws/dbt_test_file/dbt_taxi_data/ny_taxi_trips/target/manifest.json
+[0m18:02:27.059453 [debug] [MainThread]: Wrote artifact SemanticManifest to /Users/josephdaws/dbt_test_file/dbt_taxi_data/ny_taxi_trips/target/semantic_manifest.json
+[0m18:02:27.066557 [debug] [MainThread]: Wrote artifact RunExecutionResult to /Users/josephdaws/dbt_test_file/dbt_taxi_data/ny_taxi_trips/target/run_results.json
+[0m18:02:27.066861 [info ] [MainThread]: 
+[0m18:02:27.067168 [info ] [MainThread]: [32mCompleted successfully[0m
+[0m18:02:27.067412 [info ] [MainThread]: 
+[0m18:02:27.068213 [info ] [MainThread]: Done. PASS=5 WARN=0 ERROR=0 SKIP=0 TOTAL=5
+[0m18:02:27.071079 [debug] [MainThread]: Resource report: {"command_name": "run", "command_success": true, "command_wall_clock_time": 207.47147, "process_in_blocks": "0", "process_kernel_time": 0.309184, "process_mem_max_rss": "126779392", "process_out_blocks": "0", "process_user_time": 1.218212}
+[0m18:02:27.071346 [debug] [MainThread]: Command `dbt run` succeeded at 18:02:27.071300 after 207.47 seconds
+[0m18:02:27.071560 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x100d1aa80>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x103b93da0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x103b93ce0>]}
+[0m18:02:27.071748 [debug] [MainThread]: Flushing usage events
+[0m18:02:28.586795 [debug] [MainThread]: An error was encountered while trying to flush usage events
